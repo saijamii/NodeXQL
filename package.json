@@ -18,6 +18,8 @@
   "homepage": "https://github.com/saijamii/NodeXQL#readme",
   "description": "",
   "dependencies": {
-    "express": "^5.1.0"
+    "apollo-server-express": "^3.13.0",
+    "express": "^5.1.0",
+    "graphql": "^16.12.0"
   }
 }
