@@ -1,0 +1,23 @@
+{
+  "name": "nodexql",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saijamii/NodeXQL.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saijamii/NodeXQL/issues"
+  },
+  "homepage": "https://github.com/saijamii/NodeXQL#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
