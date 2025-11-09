@@ -1,5 +1,8 @@
-const { ApolloServer } = require('apollo-server-express');
+require('dotenv').config();
 const express = require('express');
+const { Pool } = require('pg');
+const { ApolloServer } = require('apollo-server-express');
+const PORT = process.env.PORT || 4000;
 
 const typeDefs = `#graphql
 type Author {
@@ -46,16 +49,70 @@ const resolvers = {
     },
 };
 
-(async () => {
+async function start() {
+    const poolConfig = {
+        user: process.env.PGUSER,
+        host: process.env.PGHOST,
+        database: process.env.PGDATABASE,
+        password: process.env.PGPASSWORD,
+        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432
+    };
+
+    // If using a cloud provider that requires SSL (e.g., Supabase, Neon), enable it:
+    if (process.env.PGSSLMODE === 'require' || process.env.PGSSLMODE === 'true') {
+        poolConfig.ssl = { rejectUnauthorized: false }; // common for demos; in prod use CA certs
+    }
+
+    const pool = new Pool(poolConfig);
+
+    try {
+        const now = await pool.query('SELECT NOW()');
+        console.log('Postgres connected, now():', now.rows[0]);
+    } catch (err) {
+        console.error('Postgres connection error:', err);
+        process.exit(1); // fail fast
+    }
+
     const app = express();
+
+    // Apollo Server
     const server = new ApolloServer({
-        typeDefs, resolvers
-    })
-    await server.start()
-    server.applyMiddleware({
-        app, path: "/graphql"
-    })
-    app.listen(4000, () => {
-        console.log('server is runing on PORT 4000/graphql');
-    })
-})()
+        typeDefs,
+        resolvers,
+        context: async ({ req }) => {
+            // Put things you want resolvers to access in context:
+            // e.g., current user (from JWT), and the DB pool.
+            // Do NOT put a connected client for every request; use pool for queries.
+            return { db: pool, req };
+        },
+    });
+
+    await server.start();
+    server.applyMiddleware({ app, path: '/graphql' });
+
+    // simple health endpoint
+    app.get('/healthz', (req, res) => res.send({ status: 'ok' }));
+
+    const httpServer = app.listen(PORT, () => {
+        console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`);
+    });
+
+    // Graceful shutdown
+    const shutdown = async () => {
+        console.log('Shutting down...');
+        await server.stop();
+        await pool.end();
+        httpServer.close(() => {
+            console.log('HTTP server closed');
+            process.exit(0);
+        });
+    };
+
+    process.on('SIGINT', shutdown);
+    process.on('SIGTERM', shutdown);
+}
+
+start().catch(err => {
+    console.error('Startup error:', err);
+    process.exit(1);
+});
