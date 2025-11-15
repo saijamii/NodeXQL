@@ -1,7 +1,6 @@
-require('dotenv').config();
-const express = require('express');
-const { Pool } = require('pg');
-const { ApolloServer } = require('apollo-server-express');
+import express from 'express';
+import { ApolloServer } from 'apollo-server-express';
+import { pool, testConnection } from './db.js';
 const PORT = process.env.PORT || 4000;
 
 const typeDefs = `#graphql
@@ -50,28 +49,7 @@ const resolvers = {
 };
 
 async function start() {
-    const poolConfig = {
-        user: process.env.PGUSER,
-        host: process.env.PGHOST,
-        database: process.env.PGDATABASE,
-        password: process.env.PGPASSWORD,
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432
-    };
-
-    // If using a cloud provider that requires SSL (e.g., Supabase, Neon), enable it:
-    if (process.env.PGSSLMODE === 'require' || process.env.PGSSLMODE === 'true') {
-        poolConfig.ssl = { rejectUnauthorized: false }; // common for demos; in prod use CA certs
-    }
-
-    const pool = new Pool(poolConfig);
-
-    try {
-        const now = await pool.query('SELECT NOW()');
-        console.log('Postgres connected, now():', now.rows[0]);
-    } catch (err) {
-        console.error('Postgres connection error:', err);
-        process.exit(1); // fail fast
-    }
+    await testConnection();
 
     const app = express();
 
