@@ -1,17 +1,16 @@
-import 'dotenv/config';
 import { Pool } from 'pg';
+import { config } from '../config/index.js';
 
 const poolConfig = {
-    user: process.env.PGUSER,
-    host: process.env.PGHOST,
-    database: process.env.PGDATABASE,
-    password: process.env.PGPASSWORD,
-    port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
+    user: config.db.user,
+    host: config.db.host,
+    database: config.db.database,
+    password: config.db.password,
+    port: config.db.port,
 };
 
-// If using a cloud provider that requires SSL (e.g., Supabase, Neon), enable it:
-if (process.env.PGSSLMODE === 'require' || process.env.PGSSLMODE === 'true') {
-    poolConfig.ssl = { rejectUnauthorized: false };
+if (config.db.ssl) {
+    poolConfig.ssl = config.db.ssl;
 }
 
 const pool = new Pool(poolConfig);
@@ -29,3 +28,4 @@ async function testConnection() {
 }
 
 export { pool, testConnection };
+
