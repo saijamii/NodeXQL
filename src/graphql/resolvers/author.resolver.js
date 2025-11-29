@@ -6,14 +6,14 @@ export const authorResolvers = {
         authors: async () => {
             return await getAllAuthors();
         },
-        author: async (parent, args) => {
+        author: async (_, args) => {
             return await getAuthorById(args.id);
         },
     },
     Author: {
-        books: async (parent) => {
-            return await getBooksByAuthorId(parent.id);
-        },
+        books: async (author, args, context) => {
+            return await getBooksByAuthorId(author.id);
+        }
     },
 };
 

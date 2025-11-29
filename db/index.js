@@ -19,7 +19,6 @@ const pool = new Pool(poolConfig);
 async function testConnection() {
     try {
         const res = await pool.query('SELECT NOW()');
-        console.log('Postgres connected:', res.rows[0].now);
     } catch (err) {
         console.error('Postgres connection error:', err.message || err);
         // rethrow so caller can decide (e.g., exit)

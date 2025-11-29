@@ -10,17 +10,17 @@ export const bookResolvers = {
             return await getBookById(args.id);
         },
     },
-    Book: {
-        author: async (parent) => {
-            if (parent.author_id) {
-                return await getAuthorById(parent.author_id);
-            }
-            return null;
-        },
-        publishedYear: (parent) => {
-            // Map published_year (snake_case) to publishedYear (camelCase)
-            return parent.published_year || parent.publishedYear;
-        },
-    },
+    // Book: {
+    //     author: async (parent) => {
+    //         if (parent.author_id) {
+    //             return await getAuthorById(parent.author_id);
+    //         }
+    //         return null;
+    //     },
+    //     publishedYear: (parent) => {
+    //         // Map published_year (snake_case) to publishedYear (camelCase)
+    //         return parent.published_year || parent.publishedYear;
+    //     },
+    // },
 };
 

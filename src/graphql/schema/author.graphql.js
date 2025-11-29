@@ -2,7 +2,11 @@ export const authorTypeDefs = `#graphql
 type Author {
   id: ID!
   name: String!
-  books: [Book]
+  email: String!
+  bio: String
+  createdAt: String!
+  updatedAt: String!
+  books: [Book]!
 }
 
 type Query {
